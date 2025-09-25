@@ -325,13 +325,13 @@ const struct iw_handler_def mtk_p2p_wext_handler_def = {
 	.num_standard = 0,
 
 #if defined(CONFIG_WEXT_PRIV) || LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 32)
-	.num_private = (__u16) sizeof(rIwPrivHandler) / sizeof(iw_handler),
-	.num_private_args = (__u16) sizeof(rIwPrivTable) / sizeof(struct iw_priv_args),
 #endif /* CONFIG_WEXT_PRIV || LINUX_VERSION_CODE <= 2.6.32 */
 	.standard = (iw_handler *) NULL,
 #if defined(CONFIG_WEXT_PRIV) || LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 32)
-	.private = rIwPrivHandler,
-	.private_args = rIwPrivTable,
+	.num_private = (__u16) sizeof(rP2PIwPrivHandler) / sizeof(iw_handler),
+	.num_private_args = (__u16) sizeof(rP2PIwPrivTable) / sizeof(struct iw_priv_args),
+	.private = rP2PIwPrivHandler,
+	.private_args = rP2PIwPrivTable,
 #endif /* CONFIG_WEXT_PRIV || LINUX_VERSION_CODE <= 2.6.32 */
 	.get_wireless_stats = NULL,
 };

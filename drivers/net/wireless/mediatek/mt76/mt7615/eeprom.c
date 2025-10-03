@@ -47,7 +47,7 @@ static int mt7615_efuse_init(struct mt7615_dev *dev, u32 base)
 	void *buf;
 	u32 val;
 
-	if (is_mt7663(&dev->mt76))
+	if (is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76))
 		len = MT7663_EEPROM_SIZE;
 
 	val = mt76_rr(dev, base + MT_EFUSE_BASE_CTRL);
@@ -103,7 +103,7 @@ mt7615_eeprom_parse_hw_band_cap(struct mt7615_dev *dev)
 {
 	u8 val, *eeprom = dev->mt76.eeprom.data;
 
-	if (is_mt7663(&dev->mt76)) {
+	if (is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76)) {
 		/* dual band */
 		dev->mphy.cap.has_2ghz = true;
 		dev->mphy.cap.has_5ghz = true;
@@ -148,7 +148,7 @@ static void mt7615_eeprom_parse_hw_cap(struct mt7615_dev *dev)
 
 	mt7615_eeprom_parse_hw_band_cap(dev);
 
-	if (is_mt7663(&dev->mt76)) {
+	if (is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76)) {
 		max_nss = 2;
 		tx_mask = FIELD_GET(MT_EE_HW_CONF1_TX_MASK,
 				    eeprom[MT7663_EE_HW_CONF1]);
@@ -197,7 +197,7 @@ int mt7615_eeprom_get_target_power_index(struct mt7615_dev *dev,
 {
 	int index;
 
-	if (is_mt7663(&dev->mt76))
+	if (is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76))
 		return mt7663_eeprom_get_target_power_index(dev, chan,
 							    chain_idx);
 
@@ -243,7 +243,7 @@ int mt7615_eeprom_get_power_delta_index(struct mt7615_dev *dev,
 					enum nl80211_band band)
 {
 	/* assume the first rate has the highest power offset */
-	if (is_mt7663(&dev->mt76)) {
+	if (is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76)) {
 		if (band == NL80211_BAND_2GHZ)
 			return MT_EE_TX0_5G_G0_TARGET_POWER;
 		else

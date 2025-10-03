@@ -187,6 +187,11 @@ static inline bool is_mt7663(struct mt76_dev *dev)
 	return mt76_chip(dev) == 0x7663;
 }
 
+static inline bool is_mt7668(struct mt76_dev *dev)
+{
+	return mt76_chip(dev) == 0x7668;
+}
+
 static inline bool is_mt7915(struct mt76_dev *dev)
 {
 	return mt76_chip(dev) == 0x7915;
@@ -237,7 +242,7 @@ static inline bool is_mt7611(struct mt76_dev *dev)
 
 static inline bool is_connac_v1(struct mt76_dev *dev)
 {
-	return is_mt7615(dev) || is_mt7663(dev) || is_mt7622(dev);
+	return is_mt7615(dev) || is_mt7663(dev) || is_mt7668(dev) || is_mt7622(dev);
 }
 
 static inline bool is_mt76_fw_txp(struct mt76_dev *dev)

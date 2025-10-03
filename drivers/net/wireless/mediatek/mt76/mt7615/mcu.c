@@ -1597,13 +1597,25 @@ out:
 static int
 mt7663_load_rom_patch(struct mt7615_dev *dev, const char **n9_firmware)
 {
-	const char *selected_rom, *secondary_rom = MT7663_ROM_PATCH;
-	const char *primary_rom = MT7663_OFFLOAD_ROM_PATCH;
+	const char *selected_rom, *secondary_rom, *primary_rom;
 	int ret;
 
-	if (!prefer_offload_fw) {
-		secondary_rom = MT7663_OFFLOAD_ROM_PATCH;
-		primary_rom = MT7663_ROM_PATCH;
+	if (is_mt7668(&dev->mt76)) {
+		/* MT7668S firmware */
+		primary_rom = MT7668_OFFLOAD_ROM_PATCH;
+		secondary_rom = MT7668_ROM_PATCH;
+		if (!prefer_offload_fw) {
+			secondary_rom = MT7668_OFFLOAD_ROM_PATCH;
+			primary_rom = MT7668_ROM_PATCH;
+		}
+	} else {
+		/* MT7663S firmware */
+		primary_rom = MT7663_OFFLOAD_ROM_PATCH;
+		secondary_rom = MT7663_ROM_PATCH;
+		if (!prefer_offload_fw) {
+			secondary_rom = MT7663_OFFLOAD_ROM_PATCH;
+			primary_rom = MT7663_ROM_PATCH;
+		}
 	}
 	selected_rom = primary_rom;
 
@@ -1621,14 +1633,26 @@ mt7663_load_rom_patch(struct mt7615_dev *dev, const char **n9_firmware)
 		selected_rom = secondary_rom;
 	}
 
-	if (!strcmp(selected_rom, MT7663_OFFLOAD_ROM_PATCH)) {
-		*n9_firmware = MT7663_OFFLOAD_FIRMWARE_N9;
-		dev->fw_ver = MT7615_FIRMWARE_V3;
-		dev->mcu_ops = &uni_update_ops;
+	if (is_mt7668(&dev->mt76)) {
+		if (!strcmp(selected_rom, MT7668_OFFLOAD_ROM_PATCH)) {
+			*n9_firmware = MT7668_OFFLOAD_FIRMWARE_N9;
+			dev->fw_ver = MT7615_FIRMWARE_V3;
+			dev->mcu_ops = &uni_update_ops;
+		} else {
+			*n9_firmware = MT7668_FIRMWARE_N9;
+			dev->fw_ver = MT7615_FIRMWARE_V2;
+			dev->mcu_ops = &sta_update_ops;
+		}
 	} else {
-		*n9_firmware = MT7663_FIRMWARE_N9;
-		dev->fw_ver = MT7615_FIRMWARE_V2;
-		dev->mcu_ops = &sta_update_ops;
+		if (!strcmp(selected_rom, MT7663_OFFLOAD_ROM_PATCH)) {
+			*n9_firmware = MT7663_OFFLOAD_FIRMWARE_N9;
+			dev->fw_ver = MT7615_FIRMWARE_V3;
+			dev->mcu_ops = &uni_update_ops;
+		} else {
+			*n9_firmware = MT7663_FIRMWARE_N9;
+			dev->fw_ver = MT7615_FIRMWARE_V2;
+			dev->mcu_ops = &sta_update_ops;
+		}
 	}
 
 	return 0;

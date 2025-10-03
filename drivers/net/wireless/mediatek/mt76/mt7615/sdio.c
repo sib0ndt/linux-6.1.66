@@ -19,8 +19,9 @@
 #include "mac.h"
 #include "mcu.h"
 
-static const struct sdio_device_id mt7663s_table[] = {
-	{ SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, 0x7603) },
+static const struct sdio_device_id mt766xs_table[] = {
+	{ SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, 0x7603) },		/* MT7663S */
+	{ SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7668) },	/* MT7668S */
 	{ }	/* Terminating entry */
 };
 
@@ -129,7 +130,16 @@ static int mt7663s_probe(struct sdio_func *func,
 
 	mdev->rev = (mt76_rr(dev, MT_HW_CHIPID) << 16) |
 		    (mt76_rr(dev, MT_HW_REV) & 0xff);
-	dev_dbg(mdev->dev, "ASIC revision: %04x\n", mdev->rev);
+	dev_info(mdev->dev, "ASIC revision: %04x, chip: %04x\n", 
+		 mdev->rev, mt76_chip(mdev));
+	
+	if (is_mt7668(mdev)) {
+		dev_info(mdev->dev, "Detected MT7668S SDIO device\n");
+	} else if (is_mt7663(mdev)) {
+		dev_info(mdev->dev, "Detected MT7663S SDIO device\n"); 
+	} else {
+		dev_warn(mdev->dev, "Unknown chip detected: %04x\n", mt76_chip(mdev));
+	}
 
 	mdev->sdio.parse_irq = mt7663s_parse_intr;
 	mdev->sdio.intr_data = devm_kmalloc(mdev->dev,
@@ -241,24 +251,28 @@ static const struct dev_pm_ops mt7663s_pm_ops = {
 };
 #endif
 
-MODULE_DEVICE_TABLE(sdio, mt7663s_table);
+MODULE_DEVICE_TABLE(sdio, mt766xs_table);
+MODULE_FIRMWARE(MT7668_OFFLOAD_FIRMWARE_N9);
+MODULE_FIRMWARE(MT7668_OFFLOAD_ROM_PATCH);
+MODULE_FIRMWARE(MT7668_FIRMWARE_N9);
+MODULE_FIRMWARE(MT7668_ROM_PATCH);
 MODULE_FIRMWARE(MT7663_OFFLOAD_FIRMWARE_N9);
 MODULE_FIRMWARE(MT7663_OFFLOAD_ROM_PATCH);
 MODULE_FIRMWARE(MT7663_FIRMWARE_N9);
 MODULE_FIRMWARE(MT7663_ROM_PATCH);
 
-static struct sdio_driver mt7663s_driver = {
+static struct sdio_driver mt766xs_driver = {
 	.name		= KBUILD_MODNAME,
 	.probe		= mt7663s_probe,
 	.remove		= mt7663s_remove,
-	.id_table	= mt7663s_table,
+	.id_table	= mt766xs_table,
 #ifdef CONFIG_PM
 	.drv = {
 		.pm = &mt7663s_pm_ops,
 	}
 #endif
 };
-module_sdio_driver(mt7663s_driver);
+module_sdio_driver(mt766xs_driver);
 
 MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
 MODULE_AUTHOR("Lorenzo Bianconi <lorenzo@kernel.org>");

@@ -285,7 +285,7 @@ void mt7615_init_txpower(struct mt7615_dev *dev,
 	    (MT_EE_RATE_POWER_EN | MT_EE_RATE_POWER_SIGN))
 		delta += rate_val & MT_EE_RATE_POWER_MASK;
 
-	if (!is_mt7663(&dev->mt76) && mt7615_ext_pa_enabled(dev, band))
+	if (!is_mt7663(&dev->mt76) && !is_mt7668(&dev->mt76) && mt7615_ext_pa_enabled(dev, band))
 		target_chains = 1;
 	else
 		target_chains = n_chains;
@@ -376,7 +376,7 @@ mt7615_init_wiphy(struct ieee80211_hw *hw)
 	hw->sta_data_size = sizeof(struct mt7615_sta);
 	hw->vif_data_size = sizeof(struct mt7615_vif);
 
-	if (is_mt7663(&phy->dev->mt76)) {
+	if (is_mt7663(&phy->dev->mt76) || is_mt7668(&phy->dev->mt76)) {
 		wiphy->iface_combinations = if_comb;
 		wiphy->n_iface_combinations = ARRAY_SIZE(if_comb);
 	} else {
@@ -450,7 +450,7 @@ u32 mt7615_reg_map(struct mt7615_dev *dev, u32 addr)
 {
 	u32 base, offset;
 
-	if (is_mt7663(&dev->mt76)) {
+	if (is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76)) {
 		base = addr & MT7663_MCU_PCIE_REMAP_2_BASE;
 		offset = addr & MT7663_MCU_PCIE_REMAP_2_OFFSET;
 	} else {

@@ -14,6 +14,7 @@
 #define MT7615_MAX_INTERFACES		16
 #define MT7615_MAX_WMM_SETS		4
 #define MT7663_WTBL_SIZE		32
+#define MT7668_WTBL_SIZE		32
 #define MT7615_WTBL_SIZE		128
 #define MT7615_WTBL_RESERVED		(mt7615_wtbl_size(dev) - 1)
 #define MT7615_WTBL_STA			(MT7615_WTBL_RESERVED - \
@@ -49,6 +50,11 @@
 #define MT7663_OFFLOAD_FIRMWARE_N9	"mediatek/mt7663_n9_v3.bin"
 #define MT7663_ROM_PATCH		"mediatek/mt7663pr2h_rebb.bin"
 #define MT7663_FIRMWARE_N9		"mediatek/mt7663_n9_rebb.bin"
+
+#define MT7668_OFFLOAD_ROM_PATCH	"mediatek/mt7668_patch_e2_hdr.bin"
+#define MT7668_OFFLOAD_FIRMWARE_N9	"mediatek/WIFI_RAM_CODE2_SDIO_MT7668.bin"
+#define MT7668_ROM_PATCH		"mediatek/mt7668_patch_e1_hdr.bin"
+#define MT7668_FIRMWARE_N9		"mediatek/WIFI_RAM_CODE_MT7668.bin"
 
 #define MT7615_EEPROM_SIZE		1024
 #define MT7663_EEPROM_SIZE		1536
@@ -414,7 +420,7 @@ static inline bool mt7615_firmware_offload(struct mt7615_dev *dev)
 
 static inline u16 mt7615_wtbl_size(struct mt7615_dev *dev)
 {
-	if (is_mt7663(&dev->mt76) && mt7615_firmware_offload(dev))
+	if ((is_mt7663(&dev->mt76) || is_mt7668(&dev->mt76)) && mt7615_firmware_offload(dev))
 		return MT7663_WTBL_SIZE;
 	else
 		return MT7615_WTBL_SIZE;
